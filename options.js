@@ -48,12 +48,10 @@ function createInsertableRow(insertable = {}) {
 
 // Chrome storage retrieval and initialization
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get(['insertables', 'linkedinUrl'], (result) => {
+  chrome.storage.sync.get(['insertables'], (result) => {
     const insertables = Array.isArray(result.insertables)
       ? result.insertables
-      : result.linkedinUrl
-        ? [{ key: 'LinkedIn', value: result.linkedinUrl }]
-        : [];
+      : [];
 
     insertables.forEach(createInsertableRow);
   });

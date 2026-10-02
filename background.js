@@ -6,13 +6,10 @@ function getInsertables(result) {
     return result.insertables;
   }
 
-  return result.linkedinUrl
-    ? [{ id: 'legacy-linkedin', key: 'LinkedIn', value: result.linkedinUrl }]
-    : [];
 }
 
 function rebuildContextMenu() {
-  chrome.storage.sync.get(['insertables', 'linkedinUrl'], (result) => {
+  chrome.storage.sync.get(['insertables'], (result) => {
     const insertables = getInsertables(result);
 
     chrome.contextMenus.removeAll(() => {
@@ -24,8 +21,8 @@ function rebuildContextMenu() {
         contexts: ['editable']
       });
 
-      insertables.forEach((insertable, index) => {
-        const id = insertable.id || `legacy-${index}`;
+      insertables.forEach((insertable) => {
+        const id = insertable.id ;
         chrome.contextMenus.create({
           id: `${itemMenuPrefix}${id}`,
           parentId: parentMenuId,
@@ -41,7 +38,7 @@ chrome.runtime.onInstalled.addListener(rebuildContextMenu);
 chrome.runtime.onStartup.addListener(rebuildContextMenu);
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'sync' && (changes.insertables || changes.linkedinUrl)) {
+  if (areaName === 'sync' && (changes.insertables)) {
     rebuildContextMenu();
   }
 });
@@ -52,7 +49,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 
   const insertableId = info.menuItemId.slice(itemMenuPrefix.length);
-  chrome.storage.sync.get(['insertables', 'linkedinUrl'], (result) => {
+  chrome.storage.sync.get(['insertables'], (result) => {
     const insertable = getInsertables(result).find((item, index) =>
       (item.id || `legacy-${index}`) === insertableId
     );
