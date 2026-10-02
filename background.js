@@ -51,7 +51,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   const insertableId = info.menuItemId.slice(itemMenuPrefix.length);
   chrome.storage.sync.get(['insertables'], (result) => {
     const insertable = getInsertables(result).find((item, index) =>
-      (item.id || `legacy-${index}`) === insertableId
+      (item.id) === insertableId
     );
 
     if (!insertable || typeof tab.id !== 'number') return;
@@ -63,9 +63,13 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         if (!element) return;
 
         if (element.isContentEditable) {
-          element.textContent = text;
+          document.execCommand('insertText', false, text);
         } else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-          element.value = text;
+          const start = element.selectionStart ?? element.value.length;
+          const end = element.selectionEnd ?? start;
+          element.setRangeText(text, start, end, 'end');
+          element.dispatchEvent(new Event('input', { bubbles: true }));
+          element.dispatchEvent(new Event('change', { bubbles: true }));
         } else {
           return;
         }
