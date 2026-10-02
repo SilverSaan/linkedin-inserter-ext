@@ -2,10 +2,7 @@ const parentMenuId = 'insertables-parent';
 const itemMenuPrefix = 'insertable-';
 
 function getInsertables(result) {
-  if (Array.isArray(result.insertables)) {
-    return result.insertables;
-  }
-
+  return Array.isArray(result.insertables) ? result.insertables : [];
 }
 
 function rebuildContextMenu() {
