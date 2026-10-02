@@ -1,15 +1,17 @@
 
 const insertablesBody = document.getElementById('insertables-body');
 const snackbar = document.getElementById('snackbar');
-let snackbarTimeout;
+const toastMessage = document.getElementById('toast-message');
+const toast = bootstrap.Toast.getOrCreateInstance(snackbar, {
+  delay: 2500,
+  autohide: true
+});
 
 function showToast(message, type = 'success') {
-  clearTimeout(snackbarTimeout);
-  snackbar.textContent = message;
-  snackbar.className = `snackbar is-visible ${type}`;
-  snackbarTimeout = setTimeout(() => {
-    snackbar.className = 'snackbar';
-  }, 2500);
+  toastMessage.textContent = message;
+  snackbar.classList.toggle('text-bg-success', type !== 'error');
+  snackbar.classList.toggle('text-bg-danger', type === 'error');
+  toast.show();
 }
 
 // Function to create a new row in the insertables table
