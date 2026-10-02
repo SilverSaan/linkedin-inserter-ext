@@ -1,19 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>LinkedIn Inserter Options</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eternal Clipboard Settings</title>
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="options.css">
 </head>
-<body style="padding: 20px; font-family: sans-serif;">
-  <h2>LinkedIn Profile Settings</h2>
+<body class="options-page">
+  <main class="container options-shell py-4 py-md-5">
+    <header class="page-header mb-4">
+      <p class="page-eyebrow mb-2">Eternal Clipboard</p>
+      <h1 class="h3 mb-0">Saved insertables</h1>
+    </header>
 
-  <label for="linkedin-url">Your LinkedIn Profile URL:</label><br><br>
-  <input type="url" id="linkedin-url" placeholder="https://www.linkedin.com/in/yourname" style="width: 300px; padding: 5px;">
+    <section class="editor-surface" aria-label="Saved insertables">
+      <div class="editor-toolbar d-flex justify-content-end p-3">
+        <button id="add" class="btn btn-outline-primary" type="button">Add insertable</button>
+      </div>
 
-  <button id="save" style="padding: 5px 15px;">Save</button>
-  <p id="status" style="color: green;"></p>
+      <div class="table-responsive">
+        <table id="insertables" class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" class="key-column">Key</th>
+              <th scope="col">Text to insert</th>
+              <th scope="col" class="actions-column">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="insertables-body"></tbody>
+        </table>
+      </div>
 
-  <!-- Connect your custom script -->
+      <footer class="editor-footer d-flex justify-content-end p-3">
+        <button id="save" class="btn btn-primary" type="button">Save changes</button>
+      </footer>
+    </section>
+  </main>
+
+  <div id="snackbar" class="snackbar" role="status" aria-live="polite" aria-atomic="true"></div>
   <script src="options.js"></script>
 </body>
 </html>

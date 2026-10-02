@@ -1,8 +1,8 @@
 {
-  "name": "LinkedIn Field Fill",
+  "name": "Eternal Clipboard",
   "description": "Saves strings (Words, Links, chains of characters) to fill any possible text input, thought to be used to fill LinkedIn profile requesting fields",
   "permissions": ["storage", "contextMenus", "activeTab", "scripting"],
-  "version": "0.1",
+  "version": "1.0",
   "options_page": "options.html",
   "manifest_version": 3,
   "background": {

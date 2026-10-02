@@ -1,19 +1,89 @@
 
+const insertablesBody = document.getElementById('insertables-body');
+const snackbar = document.getElementById('snackbar');
+let snackbarTimeout;
+
+function showToast(message, type = 'success') {
+  clearTimeout(snackbarTimeout);
+  snackbar.textContent = message;
+  snackbar.className = `snackbar is-visible ${type}`;
+  snackbarTimeout = setTimeout(() => {
+    snackbar.className = 'snackbar';
+  }, 2500);
+}
+
+// Function to create a new row in the insertables table
+function createInsertableRow(insertable = {}) {
+  const row = document.createElement('tr');
+  row.dataset.id = insertable.id || crypto.randomUUID();
+
+  const keyCell = document.createElement('td');
+  const keyInput = document.createElement('input');
+  keyInput.type = 'text';
+  keyInput.className = 'form-control';
+  keyInput.value = insertable.key || '';
+  keyInput.setAttribute('aria-label', 'Insertable name');
+  keyInput.placeholder = 'e.g. LinkedIn';
+  keyCell.append(keyInput);
+
+  const valueCell = document.createElement('td');
+  const valueInput = document.createElement('textarea');
+  valueInput.className = 'form-control';
+  valueInput.value = insertable.value || '';
+  valueInput.setAttribute('aria-label', 'Text to insert');
+  valueInput.placeholder = 'Enter the text to insert';
+  valueCell.append(valueInput);
+
+  const actionCell = document.createElement('td');
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'btn btn-outline-danger btn-sm';
+  removeButton.textContent = 'Remove';
+  removeButton.addEventListener('click', () => row.remove());
+  actionCell.append(removeButton);
+
+  row.append(keyCell, valueCell, actionCell);
+  insertablesBody.append(row);
+}
+
+// Chrome storage retrieval and initialization
 document.addEventListener('DOMContentLoaded', () => {
-  chrome.storage.sync.get(['linkedinUrl'], (result) => {
-    if (result.linkedinUrl) {
-      document.getElementById('linkedin-url').value = result.linkedinUrl;
-    }
+  chrome.storage.sync.get(['insertables', 'linkedinUrl'], (result) => {
+    const insertables = Array.isArray(result.insertables)
+      ? result.insertables
+      : result.linkedinUrl
+        ? [{ key: 'LinkedIn', value: result.linkedinUrl }]
+        : [];
+
+    insertables.forEach(createInsertableRow);
   });
 });
 
+document.getElementById('add').addEventListener('click', () => {
+  createInsertableRow();
+});
 
-document.getElementById('save').addEventListener('click', () =>
-  {
-    const url = document.getElementById('linkedin-url').value;
-    chrome.storage.sync.set({linkedinUrl: url }, () => {
-      console.log("Saved");
-      status.textContent = 'Saved successfully!';
-      setTimeout(() => { status.textContent = ''; }, 2000);
-    });
+document.getElementById('save').addEventListener('click', () => {
+  const insertables = Array.from(insertablesBody.rows, (row) => {
+    const [keyInput, valueInput] = row.querySelectorAll('input, textarea');
+    return {
+      id: row.dataset.id,
+      key: keyInput.value.trim(),
+      value: valueInput.value
+    };
+  }).filter((insertable) => insertable.key || insertable.value);
+
+  if (insertables.some((insertable) => !insertable.key || !insertable.value)) {
+    showToast('Each insertable needs a name and text.', 'error');
+    return;
+  }
+
+  chrome.storage.sync.set({ insertables }, () => {
+    if (chrome.runtime.lastError) {
+      showToast('Could not save insertables. Try removing some entries.', 'error');
+      return;
+    }
+
+    showToast('Saved successfully!');
   });
+});
